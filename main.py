@@ -4,10 +4,11 @@ import uuid
 # read command line arguments to get an input number for the root node
 import sys
 root_node = int(sys.argv[1])
+max_number = int(sys.argv[2]) if len(sys.argv) > 2 else 10
 
-numbers_available = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+numbers_available = [x for x in range(1, max_number) if x != root_node]
 
-
+print(numbers_available)
 
 def calculate(op1, operator, number):
     if operator == "+":
@@ -37,24 +38,28 @@ def add_layer(parent):
     node_val = int(parent.op1 if hasattr(parent, "op1") else root_node)
         # create the first level of children by adding the numbers available one by one
     for number in numbers_available:
-        newval = node_val + number
-        # if the number is found, then it is a solution and return from function
-        temp = Node(generate_uuid(), parent=parent, op1=int(newval), operator="-", number=number, result= node_val)
-        if is_found_solution(newval):
-            return temp
         newval = node_val - number
-        temp = Node(generate_uuid(), parent=parent,op1=int(newval), operator="+", number=number, result= node_val)
+        # if the number is found, then it is a solution and return from function
+        temp = Node(generate_uuid(), parent=parent, op1=int(newval), operator="+", number=number, result= node_val)
         if is_found_solution(newval):
             return temp
+    for number in numbers_available:
+        newval = node_val * number
+        temp = Node(generate_uuid(), parent=parent,op1=int(newval), operator="/", number=number, result= node_val)
+        if is_found_solution(newval):
+            return temp
+    for number in numbers_available:
         if node_val % number == 0:
             newval = int(node_val / number)
             temp = Node(generate_uuid(), parent=parent,op1=int(newval), operator="*", number=number, result= node_val)
             if is_found_solution(newval):
                 return temp
+    for number in numbers_available:
+        newval = node_val + number
+        temp = Node(generate_uuid(), parent=parent,op1=int(newval), operator="-", number=number, result= node_val)
+        if is_found_solution(newval):
+            return temp
     return False
-
-# call add_layer function for the root node to create the tree
-add_layer(root)
 
 for node in LevelOrderIter(root):
     # print(node)
